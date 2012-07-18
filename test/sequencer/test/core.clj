@@ -68,7 +68,7 @@
     
     (is
      (= 1000 (count @acc))
-     "bla")))
+     "all clients got unique ID")))
         
         
    
