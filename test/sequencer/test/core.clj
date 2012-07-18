@@ -50,28 +50,26 @@
      "IDs are independent")))
 
 
-(defn sequence-cycle [[id, acc]]
+(defn sequence-cycle [id acc]
   (let [p (create id)]
     (confirm id p)
-    [id, (conj acc p)]))
+    (send acc conj p)
+    id))
 
 (deftest concurrent-clients
 
-  (let [agents (map  #(agent [%, []]) ["a" "b" "c" "d"])]
+  (let [acc (agent #{})
+        agents (map  #(agent [%]) ["a" "b" "c" "d"])]
         
     (doseq [ag (take 1000 (cycle agents))]
-      (send ag sequence-cycle))
+      (send ag sequence-cycle acc))
 
     (apply await agents)
-
+    
     (is
-     (= 1000
-        (reduce
-         (fn [acc ag]
-           (let [[_ v] @ag]
-             (+ acc (count v))))
-          0
-          agents)))))
+     (= 1000 (count @acc))
+     "bla")))
+        
         
    
 
